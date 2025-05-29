@@ -2,7 +2,7 @@ using Domain.Enums;
 
 namespace Domain.DTOs;
 
-public class StudentDTO
+public class StudentDTOok
 {
     public int Id { get; set; }
     public string FirstName { get; set; }

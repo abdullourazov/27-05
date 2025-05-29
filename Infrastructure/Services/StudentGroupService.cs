@@ -1,6 +1,7 @@
 using System.Net;
 using Domain.ApiResponse;
 using Domain.DTOs;
+using Domain.DTOs.StudentGroupDTO;
 using Domain.Entities;
 using Infrastructure.Data;
 using Infrastructure.Interfaces;
@@ -10,9 +11,9 @@ namespace Infrastructure.Services;
 
 public class StudentGroupService(DataContext context) : IStudentGroupService
 {
-    public async Task<Response<string>> CreateStudentGroupAsync(StudentGroup studentGroup)
+    public async Task<Response<string>> CreateStudentGroupAsync(CreateStudentGroupDTO createStudentGroupDTO)
     {
-        await context.AddAsync(studentGroup);
+        await context.AddAsync(createStudentGroupDTO);
         var result = await context.SaveChangesAsync();
         return result == 0
         ? new Response<string>("StudentGroup not found", HttpStatusCode.NotFound)
@@ -62,9 +63,9 @@ public class StudentGroupService(DataContext context) : IStudentGroupService
         return new Response<StudentGroupDTo>(result2, "StudentGroup found succesfully");
     }
 
-    public async Task<Response<string>> UpdateStudentGroupAsync(StudentGroup studentGroup)
+    public async Task<Response<string>> UpdateStudentGroupAsync(UpdateStudentGroupDTO updateStudentGroupDTO)
     {
-        await context.StudentGroups.FindAsync(studentGroup.StudentId, studentGroup.Groupid);
+        await context.StudentGroups.FindAsync(updateStudentGroupDTO.StudentId, updateStudentGroupDTO.Groupid);
         var result = await context.SaveChangesAsync();
         return result == 0
         ? new Response<string>("StudentGroup not found", HttpStatusCode.NotFound)

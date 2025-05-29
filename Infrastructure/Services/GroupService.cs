@@ -1,6 +1,7 @@
 using System.Net;
 using Domain.ApiResponse;
 using Domain.DTOs;
+using Domain.DTOs.GroupDTO;
 using Domain.Entities;
 using Infrastructure.Data;
 using Infrastructure.Interfaces;
@@ -10,9 +11,9 @@ namespace Infrastructure.Services;
 
 public class GroupService(DataContext context) : IGroupService
 {
-    public async Task<Response<string>> CreateGroupAsunc(Group group)
+    public async Task<Response<string>> CreateGroupAsunc(CreateGroupDTO createGroupDTO)
     {
-        await context.AddAsync(group);
+        await context.AddAsync(createGroupDTO);
         var result = await context.SaveChangesAsync();
         return result == 0
         ? new Response<string>("Group not found", HttpStatusCode.NotFound)
@@ -31,10 +32,10 @@ public class GroupService(DataContext context) : IGroupService
         return new Response<string>(result.ToString(), "Group found succesfully");
     }
 
-    public async Task<Response<List<GroupDTO>>> GetGroupAsync()
+    public async Task<Response<List<GroupDTOok>>> GetGroupAsync()
     {
         var result = await context.Groups.ToListAsync();
-        var result2 = result.Select(g => new GroupDTO
+        var result2 = result.Select(g => new GroupDTOok
         {
             Id = g.Id,
             Name = g.Name,
@@ -46,19 +47,19 @@ public class GroupService(DataContext context) : IGroupService
         }).ToList();
 
         return result2 == null
-        ? new Response<List<GroupDTO>>("Group not found", HttpStatusCode.NotFound)
-        : new Response<List<GroupDTO>>(result2, "Group get succesfully");
+        ? new Response<List<GroupDTOok>>("Group not found", HttpStatusCode.NotFound)
+        : new Response<List<GroupDTOok>>(result2, "Group get succesfully");
 
     }
 
-    public Task<Response<GroupDTO>> GetGroupByIdAsync(int id)
+    public Task<Response<GroupDTOok>> GetGroupByIdAsync(int id)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<Response<string>> UpdateGroupServerAsync(Group group)
+    public async Task<Response<string>> UpdateGroupServerAsync(UpdateGroupDTO updateGroupDTO)
     {
-        await context.Groups.FindAsync(group.Id);
+        await context.Groups.FindAsync(updateGroupDTO.Id);
         var result = await context.SaveChangesAsync();
         return result == 0
         ? new Response<string>("Group not found", HttpStatusCode.NotFound)

@@ -1,6 +1,7 @@
 using System.Net;
 using Domain.ApiResponse;
 using Domain.DTOs;
+using Domain.DTOs.CourseDTO;
 using Domain.Entities;
 using Infrastructure.Data;
 using Infrastructure.Interfaces;
@@ -10,9 +11,9 @@ namespace Infrastructure.Services;
 
 public class CourseService(DataContext context) : ICourseService
 {
-    public async Task<Response<string>> CreateCourseAsync(Course course)
+    public async Task<Response<string>> CreateCourseAsync(CreateCourseDTO createCourseDTO)
     {
-        await context.AddAsync(course);
+        await context.AddAsync(createCourseDTO);
         var result = await context.SaveChangesAsync();
         return result == 0
         ? new Response<string>("Course not found", HttpStatusCode.NotFound)
@@ -65,13 +66,39 @@ public class CourseService(DataContext context) : ICourseService
         return new Response<CourseDTO>(result2, "Course found succesfully");
     }
 
-    public async Task<Response<string>> UpdateCourseAsync(Course course)
+    public async Task<Response<string>> UpdateCourseAsync(UpdateCourseDTO updateCourseDTO)
     {
-        await context.Courses.FindAsync(course.Id);
+        await context.Courses.FindAsync(updateCourseDTO.Id);
         var result = await context.SaveChangesAsync();
         return result == 0
         ? new Response<string>("Course not found", HttpStatusCode.NotFound)
         : new Response<string>(result.ToString(), "Course found succesfully");
     }
 
+    public async Task<List<GetGroupsWithCourseTitleDTO>> GetGroupsWithCourseTitle()
+    {
+        var groups = await context.Groups
+        .Include(group => group.Course)
+        .Select(group => new GetGroupsWithCourseTitleDTO()
+        {
+            GroupId = group.Id,
+            GroupName = group.Name,
+            CourseTitle = group.Course.Name,
+            Price = group.Course.Price,
+
+        }).ToListAsync();
+        return groups;
+    }
+
+    public async Task<List<GetCourseWithGroupCountDTO>> GetCourseWithGroupCount()
+    {
+        var result = await context.Courses
+        .Select(course => new GetCourseWithGroupCountDTO
+        {
+            Id = course.Id,
+            Name = course.Name,
+            CountGroups = course.Groups.Count()
+        }).ToListAsync();
+        return result;
+    }
 }

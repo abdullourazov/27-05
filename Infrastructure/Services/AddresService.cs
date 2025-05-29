@@ -5,6 +5,7 @@ using Infrastructure.Data;
 using Domain.Entities;
 using Infrastructure.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Domain.DTOs.AdressDTO;
 
 namespace Infrastructure.Services;
 
@@ -13,7 +14,6 @@ public class AddresService(DataContext context) : IAddresService
 
     public async Task<Response<List<AddresDTO>>> GetAddresAsync()
     {
-
         var result = await context.Addres.ToListAsync();
         var result2 = result.Select(a => new AddresDTO
         {
@@ -44,18 +44,18 @@ public class AddresService(DataContext context) : IAddresService
         return new Response<AddresDTO>(result2, "Addres found succesfully");
     }
 
-    public async Task<Response<string>> CreateAddresByidAsync(Addres addres)
+    public async Task<Response<string>> CreateAddresByidAsync(CreateAddrresDTO createAddrresDTO)
     {
-        await context.AddAsync(addres);
+        await context.AddAsync(createAddrresDTO);
         var result = await context.SaveChangesAsync();
         return result == 0
         ? new Response<string>("Addres not found", HttpStatusCode.NotFound)
         : new Response<string>(result.ToString(), "Addres found succesfully");
     }
 
-    public async Task<Response<string>> UpdateAddresAsync(Addres addres)
+    public async Task<Response<string>> UpdateAddresAsync(UpdateAddresDTO updateAddresDTO)
     {
-        await context.Addres.FindAsync(addres.Id);
+        await context.Addres.FindAsync(updateAddresDTO.Id);
         var result = await context.SaveChangesAsync();
         return result == 0
         ? new Response<string>("Addres not found", HttpStatusCode.NotFound)
